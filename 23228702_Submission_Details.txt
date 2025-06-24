@@ -1,0 +1,19 @@
+Name: Yahya El-Saddik
+Student ID: 23228702
+Project: DungeonMaze (GUI-Version)
+
+GitHub Repo: https://github.com/InfernoDread/DungeonMaze
+
+This video shows a walkthrough of the main features:
+- Starting and loading games
+- Three Panels:
+	- MenuPanel
+	- GamePanel
+	- BattlePanel
+- Saving to file and Derby Database
+- Using items and fleeing combat
+
+All required features have been implemented and tested.
+
+--Disclaimer--
+ChatGPT was used extensively throughout the project, but only for debugging and ideation purposes. If I wished to implement a certain feature but didn't know how, I would seek Advice from AI to teach me how to achieve what I wish to achieve and to help me debug my code and find errors. ChatGPT was NOT used to generate entire codes.

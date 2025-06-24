@@ -36,5 +36,26 @@ public class DBInitializer
                 throw e;
             }
         }
+        
+        try (Connection conn = DerbyManager.getConnection(); 
+             Statement stmt = conn.createStatement()) 
+        {
+            // Table for save summaries
+            String createSummarySQL = "CREATE TABLE save_summary (" +
+                                      "save_name VARCHAR(50) PRIMARY KEY, " +
+                                      "floor INT, " +
+                                      "current_hp INT, " +
+                                      "max_hp INT, " +
+                                      "rooms_cleared INT" +
+                                      ")";
+            stmt.executeUpdate(createSummarySQL);
+        } 
+        catch (SQLException e) 
+        {
+            if (!"X0Y32".equals(e.getSQLState())) 
+            {
+                throw e;
+            }
+        }
     }
 }

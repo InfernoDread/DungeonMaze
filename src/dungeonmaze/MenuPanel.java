@@ -180,6 +180,7 @@ public class MenuPanel extends JPanel
                 {
                     name = name.substring(0, name.length() - 4);
                 }
+
                 GameState state = null;
                 try {
                     state = DerbyGameManager.loadGameFromDB(name);
@@ -187,11 +188,54 @@ public class MenuPanel extends JPanel
                 {
                     Logger.getLogger(MenuPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
                 if (state != null) 
                 {
+                    if (state.gameIsComplete()) 
+                    {
+                        int choice = JOptionPane.showOptionDialog(
+                            this,
+                            "This game has already been completed!\nWould you like to:\n" +
+                            "1) Overwrite this save and start a new game\n" +
+                            "2) Create a new game with a different name",
+                            "Game Completed",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            new String[]{"Overwrite", "New Name"},
+                            "Overwrite"
+                        );
+
+                        if (choice == JOptionPane.YES_OPTION) 
+                        {
+                            try {
+                                DerbyGameManager.deleteSaveFromDB(name);
+                                frame.startNewGameUsingName(name);
+                            } catch (SQLException ex) {
+                                JOptionPane.showMessageDialog(this, "Failed to restart game: " + ex.getMessage());
+                            }
+                            return; // ✅ Prevent loading completed game
+                        } 
+                        else if (choice == JOptionPane.NO_OPTION) 
+                        {
+                            String newName = JOptionPane.showInputDialog("Enter a new name for your game:");
+                            if (newName != null && !newName.trim().isEmpty()) 
+                            {
+                                try {
+                                    frame.startNewGameUsingName(newName.trim());
+                                } catch (SQLException ex) {
+                                    JOptionPane.showMessageDialog(this, "Failed to start new game: " + ex.getMessage());
+                                }
+                            }
+                            return; // ✅ Prevent loading completed game
+                        }
+                    }
+
+                    // ✅ Only load if the game is not complete and no overwrite occurred
                     frame.loadGameFromState(state);
-                }
-            } else 
+                } 
+            } 
+            else 
             {
                 JOptionPane.showMessageDialog(this, "Please select a saved game.");
             }

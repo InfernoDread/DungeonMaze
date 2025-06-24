@@ -1,0 +1,33 @@
+# Ignore NetBeans build and cache directories
+nbproject/private/
+build/
+dist/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Ignore compiled class files
+*.class
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore serialized saves
+*.dat
+
+# Ignore Derby database files
+db/DungeonMazeDB/*
+!db/DungeonMazeDB/README.md  # keep a README if you have one
+
+# Optional: ignore IDE metadata from IntelliJ, VSCode, etc.
+.idea/
+.vscode/
+
+# Ignore backup files
+*~
+*.bak

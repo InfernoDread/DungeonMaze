@@ -45,7 +45,13 @@ public class DungeonFrame extends JFrame
         menuPanel = new MenuPanel(this);
         mainPanel.add(menuPanel, "Menu");
         
-        DBInitializer.createSavesTableIfNotExists();
+        try 
+        {
+            DBInitializer.createSavesTableIfNotExists();
+        } catch (SQLException e) 
+        {
+            JOptionPane.showMessageDialog(null, "Database setup failed: " + e.getMessage());
+        }
         add(mainPanel);
         setVisible(true);
     }
@@ -122,7 +128,7 @@ public class DungeonFrame extends JFrame
 //        }
 
         GameSaveAndLoad.saveGame(engine.getGameState(), 
-                playerName + ".dat", false, true, false);
+                playerName + ".dat", false, true, true);
     }
 
     public void loadGame(String filename) throws SQLException 
