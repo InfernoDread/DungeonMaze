@@ -198,7 +198,22 @@ public class DerbyGameManager
 
         return summaries;
     }
-
+    
+    public static boolean saveExists(String playerName) throws SQLException 
+    {
+        try (Connection conn = DerbyManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM saves WHERE name = ?")) 
+        {
+            stmt.setString(1, playerName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) 
+            {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+    
     // Debug method:
 //    public static void printSaveTableColumns() throws SQLException {
 //        try (Connection conn = DerbyManager.getConnection()) {

@@ -214,24 +214,31 @@ public class MenuPanel extends JPanel
                             } catch (SQLException ex) {
                                 JOptionPane.showMessageDialog(this, "Failed to restart game: " + ex.getMessage());
                             }
-                            return; // ✅ Prevent loading completed game
+                            return;
                         } 
                         else if (choice == JOptionPane.NO_OPTION) 
                         {
                             String newName = JOptionPane.showInputDialog("Enter a new name for your game:");
                             if (newName != null && !newName.trim().isEmpty()) 
                             {
-                                try {
-                                    frame.startNewGameUsingName(newName.trim());
-                                } catch (SQLException ex) {
+                                newName = newName.trim();
+                                try 
+                                {
+                                    if (DerbyGameManager.saveExists(newName)) 
+                                    {
+                                        JOptionPane.showMessageDialog(this, "This name already exists. Please pick another name.");
+                                    } else 
+                                    {
+                                        frame.startNewGameUsingName(newName);
+                                    }
+                                } catch (SQLException ex) 
+                                {
                                     JOptionPane.showMessageDialog(this, "Failed to start new game: " + ex.getMessage());
                                 }
                             }
-                            return; // ✅ Prevent loading completed game
+                            return;
                         }
                     }
-
-                    // ✅ Only load if the game is not complete and no overwrite occurred
                     frame.loadGameFromState(state);
                 } 
             } 

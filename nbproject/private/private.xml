@@ -2,6 +2,15 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/GameSaveAndLoad.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/derbyDB/DBInitializer.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/BattlePanel.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/BottomPanel.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/GamePanel.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/derbyDB/DerbyGameManager.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/DungeonFrame.java</file>
+            <file>file:/C:/Users/ysadd/OneDrive/Documents/NetBeansProjects/COMP603_Assignment_Codes/Assignment%202/DungeonMaze_GUI/src/dungeonmaze/MenuPanel.java</file>
+        </group>
     </open-files>
 </project-private>

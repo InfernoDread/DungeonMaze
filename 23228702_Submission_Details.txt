@@ -15,5 +15,13 @@ This video shows a walkthrough of the main features:
 
 All required features have been implemented and tested.
 
+Currently there are two known bug still remaining:
+
+1) When the play defeats a monster and leaves the room, If they move to the next room too quickly, sometimes the new rooms message will be overridden by the Victory message from defeating the enemy in the previous room.
+
+2) Upon completion of the game, when the player returns to the MainMenu, sometimes the game will take them back to the MainMenu only to then take them back to the GamePanel.
+
+These errors arose during last-minute complications, and I wasn't able to fully address them as there were other, much more major issues taking place. Additionally there seems to be an issue with the .jar file that I cannot figure out. Sorry for the inconvenience. 
+
 --Disclaimer--
-ChatGPT was used extensively throughout the project, but only for debugging and ideation purposes. If I wished to implement a certain feature but didn't know how, I would seek Advice from AI to teach me how to achieve what I wish to achieve and to help me debug my code and find errors. ChatGPT was NOT used to generate entire codes.
+ChatGPT was used extensively throughout the project, but only for debugging and ideation purposes. If I wished to implement a certain feature but didn't know how, I would seek Advice from AI to teach me how to achieve what I wish to achieve and to help me debug my code and find errors. ChatGPT was NOT used to generate entire codes. ChatGPT was also used to generate the images used in this game.

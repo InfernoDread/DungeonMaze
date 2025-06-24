@@ -5,6 +5,7 @@
 package dungeonmaze;
 
 import derbyDB.DBInitializer;
+import derbyDB.DerbyGameManager;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.io.File;
@@ -67,13 +68,13 @@ public class DungeonFrame extends JFrame
                 showMenu();
                 return;
             }
-            if (playerName.trim().isEmpty()) 
+            playerName = playerName.trim();
+            if (playerName.isEmpty()) 
             {
                 JOptionPane.showMessageDialog(this, "Name cannot be empty.");
                 continue;
             }
-            File saveFile = new File("saved_games/" + playerName.trim() + ".dat");
-            if (saveFile.exists()) 
+            if (DerbyGameManager.saveExists(playerName)) 
             {
                 JOptionPane.showMessageDialog(this, "That name is already in use. Please choose a different name.");
             } 
@@ -83,7 +84,7 @@ public class DungeonFrame extends JFrame
             }
         }
 
-        startNewGameUsingName(playerName.trim());
+        startNewGameUsingName(playerName);
     }
 
     public void startNewGameUsingName(String playerName) throws SQLException 
