@@ -4,7 +4,11 @@
  */
 package dungeonmaze;
 
+import derbyDB.DerbyGameManager;
 import javax.swing.SwingUtilities;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -12,11 +16,20 @@ import javax.swing.SwingUtilities;
  */
 public class Main 
 {
-    public static void main(String[] args) 
+    public static void main(String[] args) throws SQLException
     {
         SwingUtilities.invokeLater(() -> 
         {
-            new DungeonFrame();
+            
+            try 
+            {
+                new DungeonFrame();
+                //Debugging code:
+//                DerbyGameManager.printSaveTableColumns();
+            } catch (SQLException ex) 
+            {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 }

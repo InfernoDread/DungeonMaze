@@ -12,7 +12,10 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -119,10 +122,22 @@ public class BattlePanel extends JPanel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 5));
         
         lightAttackButton = new JButton("Light Attack");
-        lightAttackButton.addActionListener(e -> performAttack("light"));
+        lightAttackButton.addActionListener(e -> {
+            try {
+                performAttack("light");
+            } catch (SQLException ex) {
+                Logger.getLogger(BattlePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         
         heavyAttackButton = new JButton("Heavy Attack");
-        heavyAttackButton.addActionListener(e -> performAttack("heavy"));
+        heavyAttackButton.addActionListener(e -> {
+            try {
+                performAttack("heavy");
+            } catch (SQLException ex) {
+                Logger.getLogger(BattlePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         
         itemButton = new JButton("Use Item");
         itemButton.addActionListener(e -> useItem());
@@ -131,7 +146,13 @@ public class BattlePanel extends JPanel
         fleeButton.addActionListener(e -> flee());
         
         saveAndQuitButton = new JButton("Save & Quit");
-        saveAndQuitButton.addActionListener(e -> saveAndQuit());
+        saveAndQuitButton.addActionListener(e -> {
+            try {
+                saveAndQuit();
+            } catch (SQLException ex) {
+                Logger.getLogger(BattlePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         
         buttonPanel.add(lightAttackButton);
         buttonPanel.add(heavyAttackButton);
@@ -166,7 +187,7 @@ public class BattlePanel extends JPanel
         battleBubble.setMessage(msg);
     }
     
-    private void performAttack(String type) 
+    private void performAttack(String type) throws SQLException 
     {
         int roll = Dice.roll(20);
         int damage;
@@ -212,7 +233,7 @@ public class BattlePanel extends JPanel
         isNewTurn = true;
     }
     
-    private void performEnemyTurn() 
+    private void performEnemyTurn() throws SQLException 
     {
         int roll = Dice.roll(10);
         int damage;
@@ -251,7 +272,7 @@ public class BattlePanel extends JPanel
         isNewTurn = true;
     }
     
-    private void checkBattleOutcome() 
+    private void checkBattleOutcome() throws SQLException 
     {
         if (!player.isAlive()) 
         {
@@ -289,7 +310,7 @@ public class BattlePanel extends JPanel
                 gameState.setGameIsComplete(true);
                 JOptionPane.showMessageDialog(this, "Victory! You beat the game.");
                 GameSaveAndLoad.saveGame(gameState, player.getName() 
-                        + ".dat", false, true);
+                        + ".dat", false, true, true);
 
                 int choice = JOptionPane.showOptionDialog(
                     this,
@@ -355,7 +376,7 @@ public class BattlePanel extends JPanel
         delayTimer.start();
     }
 
-    private void saveAndQuit() 
+    private void saveAndQuit() throws SQLException 
     {
         int confirm = JOptionPane.showConfirmDialog(
             this,
@@ -366,7 +387,7 @@ public class BattlePanel extends JPanel
         
         if (confirm == JOptionPane.YES_OPTION) 
         {
-            GameSaveAndLoad.saveGame(gameState, player.getName() + ".dat", false, true);
+            GameSaveAndLoad.saveGame(gameState, player.getName() + ".dat", false, true, true);
 
             int choice = JOptionPane.showOptionDialog(
                 this,

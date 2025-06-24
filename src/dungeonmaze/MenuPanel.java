@@ -4,6 +4,7 @@
  */
 package dungeonmaze;
 
+import derbyDB.DerbyGameManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -15,7 +16,10 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -41,7 +45,7 @@ public class MenuPanel extends JPanel
     private DefaultListModel<String> saveListModel;
     private JList<String> saveList;
     private Image backgroundImage;
-    
+
     private JButton loadButton;
     private JButton deleteButton;
 
@@ -66,7 +70,7 @@ public class MenuPanel extends JPanel
         }
 
         setLayout(new BorderLayout());
-        
+
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setOpaque(false);
 
@@ -87,15 +91,18 @@ public class MenuPanel extends JPanel
         topPanel.add(Box.createVerticalStrut(30));
 
         // Welcome message
-        JLabel welcomeMsg = new JLabel("<html><div style='text-align: center;"
-                + "'>Welcome to the Dungeon Crawler!<br>Only the brave will "
-                + "survive the dungeon.<br>Would you like to:</div></html>", 
-                SwingConstants.CENTER);
+        JLabel welcomeMsg = new JLabel(
+            "<html><div style='text-align: center;'>"
+            + "Welcome to the Dungeon Crawler!<br>"
+            + "Only the brave will survive the dungeon.<br>"
+            + "Would you like to:</div></html>",
+            SwingConstants.CENTER
+        );
         welcomeMsg.setFont(new Font("SansSerif", Font.PLAIN, 16));
         welcomeMsg.setForeground(Color.LIGHT_GRAY);
         welcomeMsg.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(welcomeMsg);
-        
+
         contentPanel.add(topPanel, BorderLayout.NORTH);
 
         // Button Section
@@ -110,15 +117,20 @@ public class MenuPanel extends JPanel
         newGameButton.setForeground(Color.LIGHT_GRAY);
         newGameButton.setOpaque(true);
         newGameButton.setBorderPainted(true);
-        
-        newGameButton.addActionListener(e -> frame.startNewGame());
+
+        newGameButton.addActionListener(e -> {
+            try {
+                frame.startNewGame();
+            } catch (SQLException ex) {
+                Logger.getLogger(MenuPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         middlePanel.add(Box.createVerticalStrut(10));
         middlePanel.add(newGameButton);
         middlePanel.add(Box.createVerticalStrut(20));
-        
+
         // Load & Delete Saves Section
         middlePanel.add(initLoadGameSection());
-        
         contentPanel.add(middlePanel, BorderLayout.SOUTH);
         add(contentPanel, BorderLayout.CENTER);
 
@@ -129,7 +141,7 @@ public class MenuPanel extends JPanel
         quitButton.setForeground(Color.LIGHT_GRAY);
         quitButton.setOpaque(true);
         quitButton.setBorderPainted(true);
-        
+
         quitButton.addActionListener(e -> System.exit(0));
         JPanel quitPanel = new JPanel();
         quitPanel.setOpaque(false);
@@ -146,12 +158,12 @@ public class MenuPanel extends JPanel
         saveList = new JList<>(saveListModel);
         saveList.setBackground(new Color(30, 30, 30));
         saveList.setForeground(Color.LIGHT_GRAY);
-        
+
         JScrollPane scrollPane = new JScrollPane(saveList);
         scrollPane.setOpaque(true);
         scrollPane.getViewport().setOpaque(true);
         scrollPane.setPreferredSize(new Dimension(400, 100));
-        
+
         loadButton = new JButton("Load Selected Game");
         loadButton.setBackground(new Color(40, 40, 40));
         loadButton.setForeground(Color.LIGHT_GRAY);
@@ -163,35 +175,21 @@ public class MenuPanel extends JPanel
             if (index != -1) 
             {
                 String summary = saveListModel.getElementAt(index);
-                String filename = summary.split("\\|")[0];
-                GameState state = GameSaveAndLoad.loadGame(filename);
-                if (state == null) return;
-                
-                if (state.gameIsComplete()) 
+                String name = summary.split("\\|")[0].trim();
+                if (name.endsWith(".dat")) 
                 {
-                    int choice = JOptionPane.showOptionDialog(this,
-                            """
-                            This game has already been completed.
-                            Would you like to overwrite the save or start a new game?""",
-                        "Game Completed",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new Object[]{"Overwrite", "New Game"},
-                        "New Game"
-                    );
-
-                    if (choice == JOptionPane.YES_OPTION) 
-                    {
-                        GameSaveAndLoad.removeFromSaveIndex(filename);
-                        frame.startNewGameUsingName(filename.replace(".dat", ""));
-                    } else if (choice == JOptionPane.NO_OPTION) 
-                    {
-                        frame.startNewGame();
-                    }
-                } else 
+                    name = name.substring(0, name.length() - 4);
+                }
+                GameState state = null;
+                try {
+                    state = DerbyGameManager.loadGameFromDB(name);
+                } catch (SQLException ex) 
                 {
-                    frame.loadGame(filename);
+                    Logger.getLogger(MenuPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (state != null) 
+                {
+                    frame.loadGameFromState(state);
                 }
             } else 
             {
@@ -204,29 +202,33 @@ public class MenuPanel extends JPanel
         deleteButton.setForeground(Color.LIGHT_GRAY);
         deleteButton.setOpaque(true);
         deleteButton.setBorderPainted(false);
-        
+
         deleteButton.addActionListener(e -> 
         {
             int index = saveList.getSelectedIndex();
             if (index != -1) 
             {
                 String summary = saveListModel.getElementAt(index);
-                String filename = summary.split("\\|")[0];
-                
+                String name = summary.split("\\|")[0];
+
                 int confirm = JOptionPane.showConfirmDialog(
                     this,
-                    "Are you sure you want to delete this save file?\n(" 
-                            + filename + ")",
+                    "Are you sure you want to delete this save?\n(" 
+                            + name + ")",
                     "Confirm Delete",
                     JOptionPane.YES_NO_OPTION
                 );
-                
+
                 if (confirm == JOptionPane.YES_OPTION) 
                 {
-                    GameSaveAndLoad.removeFromSaveIndex(filename);
-                    loadSaveList();
-                    JOptionPane.showMessageDialog(this, 
-                            "Save deleted successfully.");
+                    try {
+                        DerbyGameManager.deleteSaveFromDB(name);
+                        loadSaveList();
+                        JOptionPane.showMessageDialog(this, 
+                                "Save deleted successfully.");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(MenuPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             } else 
             {
@@ -234,30 +236,38 @@ public class MenuPanel extends JPanel
                         "Please select a save to delete.");
             }
         });
-        
+
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         buttonPanel.add(loadButton);
         buttonPanel.add(deleteButton);
-        
+
         JLabel savedGamesLabel = new JLabel("Saved Games:");
         savedGamesLabel.setForeground(Color.LIGHT_GRAY);
         panel.add(savedGamesLabel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         loadSaveList();
-        
+
         return panel;
     }
-    
+
     public void loadSaveList() 
     {
-        List<String> summaries = GameSaveAndLoad.readSaveSummaries();
         saveListModel.clear();
-        
-        if (summaries.isEmpty()) 
+        List<String> summaries;
+        try {
+            summaries = DerbyGameManager.getAllSaveSummaries();
+        } catch (SQLException ex) {
+            Logger.getLogger(MenuPanel.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
+
+        if (summaries == null || summaries.isEmpty()) 
         {
             saveListModel.addElement("(No saved games found)");
+            loadButton.setEnabled(false);
+            deleteButton.setEnabled(false);
         } 
         else 
         {
@@ -265,19 +275,16 @@ public class MenuPanel extends JPanel
             {
                 saveListModel.addElement(summary);
             }
+            loadButton.setEnabled(true);
+            deleteButton.setEnabled(true);
         }
-        
-        boolean hasSaves = !summaries.isEmpty() && 
-                !summaries.get(0).contains("No saved games");
-        loadButton.setEnabled(hasSaves);
-        deleteButton.setEnabled(hasSaves);
     }
-    
+
     public void reloadSaveList() 
     {
         loadSaveList();
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) 
     {

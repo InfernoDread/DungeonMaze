@@ -15,6 +15,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.OverlayLayout;
 import javax.swing.SwingUtilities;
@@ -232,10 +233,10 @@ public class GamePanel extends JPanel
         );
     }
 
-    public void saveGame() 
+    public void saveGame() throws SQLException 
     {
         String filename = engine.getPlayer().getName() + ".dat";
-        GameSaveAndLoad.saveGame(engine.getGameState(), filename, false, true);
+        GameSaveAndLoad.saveGame(engine.getGameState(), filename, false, true, true);
 
         int choice = JOptionPane.showOptionDialog(
             this,

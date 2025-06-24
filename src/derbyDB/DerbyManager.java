@@ -20,15 +20,4 @@ public class DerbyManager
     {
         return DriverManager.getConnection(DB_URL);
     }
-    
-    public static void main(String[] args) 
-    {
-        try (Connection conn = getConnection()) 
-        {
-            System.out.println("Connected to Derby successfully!");
-        } catch (SQLException e) 
-        {
-            System.err.println("Failed to connect: " + e.getMessage());
-        }
-    }
 }

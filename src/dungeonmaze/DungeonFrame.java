@@ -4,13 +4,14 @@
  */
 package dungeonmaze;
 
+import derbyDB.DBInitializer;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.io.File;
+import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 
 /**
  *
@@ -28,9 +29,9 @@ public class DungeonFrame extends JFrame
     private GamePanel gamePanel;
     private BattlePanel battlePanel;
 
-    private DungeonEngine engine;
+    DungeonEngine engine;
 
-    public DungeonFrame() 
+    public DungeonFrame() throws SQLException 
     {
         setTitle("DungeonMaze - GUI Edition");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,12 +44,13 @@ public class DungeonFrame extends JFrame
 
         menuPanel = new MenuPanel(this);
         mainPanel.add(menuPanel, "Menu");
-
+        
+        DBInitializer.createSavesTableIfNotExists();
         add(mainPanel);
         setVisible(true);
     }
 
-    public void startNewGame() 
+    public void startNewGame() throws SQLException 
     {
         String playerName;
         while (true) 
@@ -78,7 +80,7 @@ public class DungeonFrame extends JFrame
         startNewGameUsingName(playerName.trim());
     }
 
-    public void startNewGameUsingName(String playerName) 
+    public void startNewGameUsingName(String playerName) throws SQLException 
     {
         if (gamePanel != null) 
         {
@@ -120,10 +122,10 @@ public class DungeonFrame extends JFrame
 //        }
 
         GameSaveAndLoad.saveGame(engine.getGameState(), 
-                playerName + ".dat", false, true);
+                playerName + ".dat", false, true, false);
     }
 
-    public void loadGame(String filename) 
+    public void loadGame(String filename) throws SQLException 
     {
         if (gamePanel != null) 
         {
@@ -188,6 +190,35 @@ public class DungeonFrame extends JFrame
         });
         mainPanel.add(battlePanel, "Battle");
         cardLayout.show(mainPanel, "Battle");
+    }
+    
+    public void loadGameFromState(GameState state) 
+    {
+        if (gamePanel != null) 
+        {
+            mainPanel.remove(gamePanel);
+            gamePanel.removeAll();
+            gamePanel.setVisible(false);
+            gamePanel = null;
+        }
+
+        if (battlePanel != null) 
+        {
+            mainPanel.remove(battlePanel);
+        }
+
+        gamePanel = new GamePanel(this);
+        GUI_GameUI guiUI = new GUI_GameUI(gamePanel);
+        engine = new DungeonEngine(guiUI, state.getPlayer(), state.getMap());
+
+        gamePanel.setEngine(engine);
+        mainPanel.add(gamePanel, "Game");
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        cardLayout.show(mainPanel, "Game");
+
+        gamePanel.refreshProfile();
+        gamePanel.renderCurrentRoom();
     }
 
     public GamePanel getGamePanel() 

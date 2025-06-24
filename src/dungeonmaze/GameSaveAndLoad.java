@@ -17,6 +17,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import derbyDB.DerbyGameManager;
+import java.sql.SQLException;
+
 
 /**
  *
@@ -29,51 +32,53 @@ import javax.swing.JOptionPane;
 public class GameSaveAndLoad 
 {
     // Default contructor: No exiting or overwriting
-    public static void saveGame(GameState state, String filename) 
+    public static void saveGame(GameState state, String filename) throws SQLException 
     {
-        saveGame(state, filename, false, false);
+        saveGame(state, filename, false, false, false);
     }
     //Secondary Contructor: Used for exiting, overwriting, or both.
-    public static void saveGame(GameState state, String filename, 
-            boolean exitAfterSave, boolean allowOverwrite) 
+    public static void saveGame(GameState gameState, String filename, boolean exitAfterSave, boolean overwrite, boolean isFromDerby) throws SQLException
     {
+        if (isFromDerby) 
+        {
+            DerbyGameManager.saveGameToDB(gameState, filename.replace(".dat", ""), overwrite);
+            return;
+        }
+
         File dir = new File("saved_games");
         if (!dir.exists()) 
         {
             dir.mkdir();
         }
-        
-        File file = new File("saved_games/" + filename);
-        if (file.exists() && !allowOverwrite) 
-        {
-            JOptionPane.showMessageDialog(null, "A save with this name already exists.\nPlease use a different name.", "Save Blocked", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) 
-        {
-            out.writeObject(state);
-            updateSaveIndex(state, filename);
 
-            if (exitAfterSave) 
-            {
-                JOptionPane.showMessageDialog(null, "Game saved successfully.\nGoodbye, hope to see you again soon!");
-                System.exit(0);
-            }
-        } catch (IOException e) 
+        File file = new File(dir, filename);
+        if (file.exists() && !overwrite) return;
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) 
         {
-            JOptionPane.showMessageDialog(null, "Error saving game: " + e.getMessage(), "Save Error", JOptionPane.ERROR_MESSAGE);
+            oos.writeObject(gameState);
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("Error saving game: " + e.getMessage());
         }
     }
     
-    public static GameState loadGame(String filename) 
+    public static GameState loadGame(String filename) throws SQLException 
     {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("saved_games/" + filename))) 
+        if (filename.endsWith(".db")) 
+        {
+            return DerbyGameManager.loadGameFromDB(filename.replace(".db", ""));
+        }
+
+        File file = new File("saved_games", filename);
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) 
         {
             return (GameState) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) 
+        } 
+        catch (IOException | ClassNotFoundException e) 
         {
-            JOptionPane.showMessageDialog(null, "Error loading game: " + e.getMessage(), "Load Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Error loading game: " + e.getMessage());
             return null;
         }
     }

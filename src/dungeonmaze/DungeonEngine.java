@@ -4,6 +4,8 @@
  */
 package dungeonmaze;
 
+import java.sql.SQLException;
+
 /**
  *
  * @author ysadd
@@ -25,7 +27,7 @@ public class DungeonEngine
         this.gameState = new GameState(player, map);
     }
     
-    public void loadSavedGame(String fileName) 
+    public void loadSavedGame(String fileName) throws SQLException 
     {
         gameState = GameSaveAndLoad.loadGame(fileName);
 

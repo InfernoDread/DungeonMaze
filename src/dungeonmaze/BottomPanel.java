@@ -14,8 +14,10 @@ import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import java.sql.SQLException;
 
 /**
  *
@@ -126,7 +128,19 @@ public class BottomPanel extends JPanel
         }
         
         inventoryBtn.addActionListener(e -> gamePanel.showInventory());
-        saveBtn.addActionListener(e -> gamePanel.saveGame());
+        saveBtn.addActionListener(e -> {
+            try 
+            {
+                gamePanel.saveGame();
+            } 
+            catch (SQLException ex) 
+            {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to save game: " 
+                        + ex.getMessage(), "Database Error", 
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
         
         buttonPanel.add(inventoryBtn);
         buttonPanel.add(saveBtn);
